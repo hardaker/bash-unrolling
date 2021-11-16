@@ -12,6 +12,9 @@ def parse_args():
                                 description=__doc__,
                                 epilog="Exmaple Usage: ")
 
+        parser.add_argument("-n", "--print-nodes", action="store_true",
+                            help="Print tree nodes instead of text output")
+
         parser.add_argument("--log-level", "--ll", default="info",
                             help="Define the logging verbosity level (debug, info, warning, error, fotal, critical).")
 
@@ -79,10 +82,16 @@ def main():
         unrolled_nodes = basic_node_unroll(replaced_nodes,
                                            output_stream=args.output_file)
         
-        args.output_file.write('unrolled nodes: ')
-        for ast in unrolled_nodes:
-	            args.output_file.write(ast.dump() + "\n")
-
+        if args.print_nodes:
+                args.output_file.write("unrolled nodes: \n")
+                for ast in unrolled_nodes:
+	                    args.output_file.write(ast.dump() + "\n")
+        else:
+                args.output_file.write("unrolled nodes: \n")
+                commands_executed = \
+                        bashparse.return_nodes_of_type(unrolled_nodes, 'command')  
+                for command in commands_executed:
+	                    args.output_file.write(bashparse.convert_tree_to_string(command) + "\n")
 
 if __name__ == "__main__":
         main()
